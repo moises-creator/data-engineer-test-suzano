@@ -21,62 +21,64 @@ url = "https://br.investing.com/indices/bloomberg-commodity"
 try:
     driver.get(url)
 
-    # Aguarde até que o botão seja clicável
+    # Aguarde até que o botão de "Histórico" seja clicável
     WebDriverWait(driver, 10).until(
         EC.element_to_be_clickable((By.XPATH, "/html/body/div[1]/div[2]/div[2]/div[2]/div[1]/nav/div[2]/ul/li[2]/a"))
     ).click()
 
-    # Abre período
+    # Aguarde até que o campo de seleção de período seja clicável
     WebDriverWait(driver, 10).until(
         EC.element_to_be_clickable((By.XPATH, "/html/body/div[1]/div[2]/div[2]/div[2]/div[1]/div[2]/div[2]/div[1]/div[2]"))
     ).click()
 
-    # Seleciona mensal
+    # Seleciona "Mensal"
     WebDriverWait(driver, 10).until(
         EC.element_to_be_clickable((By.XPATH, "/html/body/div[1]/div[2]/div[2]/div[2]/div[1]/div[2]/div[2]/div[1]/div[2]/div/div[3]"))
     ).click()
 
-    # Seleciona data
+    # Seleciona o campo de data inicial
     WebDriverWait(driver, 10).until(
-        EC.element_to_be_clickable((By.XPATH, "/html/body/div[1]/div[2]/div[2]/div[2]/div[1]/div[2]/div[2]/div[2]/div[2]"))
+        EC.element_to_be_clickable((By.XPATH, "/html/body/div[1]/div[2]/div[2]/div[2]/div[1]/div[3]/div[2]/div[2]/div[3]/div[1]/div[1]/input"))
     ).click()
 
-    # Localiza o campo de data inicial
-    data_inicial = WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located((By.XPATH, "/html/body/div[1]/div[2]/div[2]/div[2]/div[1]/div[3]/div[2]/div[2]/div[3]/div[1]/div[1]/input"))
+    # Clique para abrir o calendário
+    calendar_input = driver.find_element(By.XPATH, "/html/body/div[1]/div[2]/div[2]/div[2]/div[1]/div[3]/div[2]/div[2]/div[3]/div[1]/div[1]/input")
+    driver.execute_script("arguments[0].click();", calendar_input)
+
+    # Selecione o ano (1991) - Clique no seletor de ano
+    year_selector = WebDriverWait(driver, 10).until(
+        EC.element_to_be_clickable((By.XPATH, "//span[@class='ui-datepicker-year']"))
     )
+    year_selector.click()
 
-    # Verifica se o campo é clicável
-    driver.execute_script("arguments[0].scrollIntoView(true);", data_inicial)
-    driver.execute_script("arguments[0].value = arguments[1];", data_inicial, "")
-    
-    # Alterando a data com JavaScript
-    driver.execute_script("arguments[0].value = '1991-01-01';", data_inicial)
+    # Escolha 1991 na lista de anos
+    year_1991 = WebDriverWait(driver, 10).until(
+        EC.element_to_be_clickable((By.XPATH, "//option[@value='1991']"))
+    )
+    year_1991.click()
 
+    # Selecione o mês (Janeiro) - Clique no seletor de mês
+    month_selector = WebDriverWait(driver, 10).until(
+        EC.element_to_be_clickable((By.XPATH, "//span[@class='ui-datepicker-month']"))
+    )
+    month_selector.click()
 
-    # Clique em aplicar para confirmar as alterações
+    # Escolha Janeiro (mês 0 no calendário, já que o índice começa em 0)
+    january = WebDriverWait(driver, 10).until(
+        EC.element_to_be_clickable((By.XPATH, "//option[@value='0']"))
+    )
+    january.click()
+
+    # Selecione o dia 1
+    day_1 = WebDriverWait(driver, 10).until(
+        EC.element_to_be_clickable((By.XPATH, "//a[text()='1']"))
+    )
+    day_1.click()
+
+    # Aplica as alterações
     aplicar = WebDriverWait(driver, 10).until(
         EC.element_to_be_clickable((By.XPATH, "/html/body/div[1]/div[2]/div[2]/div[2]/div[1]/div[3]/div[2]/div[2]/div[3]/div[2]"))
     )
-
-    # Rola até o botão para torná-lo visível
-    driver.execute_script("arguments[0].scrollIntoView(true);", aplicar)
-    print("Botão aplicar visível.")
-
-    # Aguarda um pouco para garantir que o scroll foi concluído
-    time.sleep(1)
-
-    # Verifica se há pop-ups e os fecha
-    try:
-        close_button = WebDriverWait(driver, 5).until(
-            EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'Fechar') or contains(@aria-label, 'Close')]"))
-        )
-        close_button.click()
-        print("Modal fechado com sucesso.")
-    except Exception as e:
-        print("Nenhum modal encontrado.", e)
-
-    # Tenta clicar no botão usando JavaScript
     driver.execute_script("arguments[0].click();", aplicar)
 
     # Aguarda a tabela carregar
@@ -86,7 +88,6 @@ try:
 
     # Extraindo os dados da tabela
     headers = [th.text for th in table.find_elements(By.TAG_NAME, "th")]
-
     rows = []
     for tr in table.find_elements(By.TAG_NAME, "tr"):
         row = [td.text for td in tr.find_elements(By.TAG_NAME, "td")]
