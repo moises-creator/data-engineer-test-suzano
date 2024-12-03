@@ -76,7 +76,7 @@ You need to build a code that gets the data in a automatic way and load the data
 
 **Seize this opportunity to demonstrate your skills in some data pipeline orchestration framework, containerization and cloud computing technology!**
 
-Store your code in your Github account make it **private** 
+Store your code in your Github account make it **private**
 
 
 Good luck!
