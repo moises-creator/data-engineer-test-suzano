@@ -39,41 +39,12 @@ try:
     # Seleciona o campo de data inicial
     WebDriverWait(driver, 10).until(
         EC.element_to_be_clickable((By.XPATH, "/html/body/div[1]/div[2]/div[2]/div[2]/div[1]/div[3]/div[2]/div[2]/div[3]/div[1]/div[1]/input"))
-    ).click()
-
-    # Clique para abrir o calendário
-    calendar_input = driver.find_element(By.XPATH, "/html/body/div[1]/div[2]/div[2]/div[2]/div[1]/div[3]/div[2]/div[2]/div[3]/div[1]/div[1]/input")
-    driver.execute_script("arguments[0].click();", calendar_input)
-
-    # Selecione o ano (1991) - Clique no seletor de ano
-    year_selector = WebDriverWait(driver, 10).until(
-        EC.element_to_be_clickable((By.XPATH, "//span[@class='ui-datepicker-year']"))
     )
-    year_selector.click()
 
-    # Escolha 1991 na lista de anos
-    year_1991 = WebDriverWait(driver, 10).until(
-        EC.element_to_be_clickable((By.XPATH, "//option[@value='1991']"))
-    )
-    year_1991.click()
-
-    # Selecione o mês (Janeiro) - Clique no seletor de mês
-    month_selector = WebDriverWait(driver, 10).until(
-        EC.element_to_be_clickable((By.XPATH, "//span[@class='ui-datepicker-month']"))
-    )
-    month_selector.click()
-
-    # Escolha Janeiro (mês 0 no calendário, já que o índice começa em 0)
-    january = WebDriverWait(driver, 10).until(
-        EC.element_to_be_clickable((By.XPATH, "//option[@value='0']"))
-    )
-    january.click()
-
-    # Selecione o dia 1
-    day_1 = WebDriverWait(driver, 10).until(
-        EC.element_to_be_clickable((By.XPATH, "//a[text()='1']"))
-    )
-    day_1.click()
+    # Foca no campo e insere a data
+    data_inicial = driver.find_element(By.XPATH, "/html/body/div[1]/div[2]/div[2]/div[2]/div[1]/div[3]/div[2]/div[2]/div[3]/div[1]/div[1]/input")
+    driver.execute_script("arguments[0].scrollIntoView(true);", data_inicial)
+    driver.execute_script("arguments[0].value = '1991-01-01';", data_inicial)
 
     # Aplica as alterações
     aplicar = WebDriverWait(driver, 10).until(
@@ -98,7 +69,7 @@ try:
     print(df)
 
     # Salvar os dados em CSV
-    df.to_csv('C:\\Users\\MOTTA\\Downloads\\data-engineer-test-main\\src\\data\\BloombergCommodity.csv', index=False)
+    df.to_csv('data\\BloombergCommodity.csv', index=False)
 
 finally:
     driver.quit()

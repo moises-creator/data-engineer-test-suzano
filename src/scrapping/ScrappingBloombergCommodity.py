@@ -14,6 +14,7 @@ options.add_argument("--disable-extensions")
 options.add_argument("--disable-notifications")
 options.add_argument("--disable-Advertisement")
 options.add_argument("--disable-popup-blocking")
+
 driver = webdriver.Chrome(service=service, options=options)
 
 url = "https://br.investing.com/indices/bloomberg-commodity"
@@ -42,45 +43,12 @@ try:
     ).click()
 
     # Localiza o campo de data inicial
-    data_inicial = WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located((By.XPATH, "/html/body/div[1]/div[2]/div[2]/div[2]/div[1]/div[3]/div[2]/div[2]/div[3]/div[1]/div[1]/input"))
+    data_inicial = WebDriverWait(driver, 5).until(
+        EC.presence_of_element_located((By.XPATH, "/html/body/div[1]/div[2]/div[2]/div[2]/div[1]/div[2]/div[2]/div[2]/div[3]/div[1]/div[1]/span[1]"))
     )
-
-    # Verifica se o campo é clicável
-    driver.execute_script("arguments[0].scrollIntoView(true);", data_inicial)
-    driver.execute_script("arguments[0].value = arguments[1];", data_inicial, "")
-    
-    # Alterando a data com JavaScript
-    driver.execute_script("arguments[0].value = '1991-01-01';", data_inicial)
-
-
-    # Clique em aplicar para confirmar as alterações
-    aplicar = WebDriverWait(driver, 10).until(
-        EC.element_to_be_clickable((By.XPATH, "/html/body/div[1]/div[2]/div[2]/div[2]/div[1]/div[3]/div[2]/div[2]/div[3]/div[2]"))
-    )
-
-    # Rola até o botão para torná-lo visível
-    driver.execute_script("arguments[0].scrollIntoView(true);", aplicar)
-    print("Botão aplicar visível.")
-
-    # Aguarda um pouco para garantir que o scroll foi concluído
-    time.sleep(1)
-
-    # Verifica se há pop-ups e os fecha
-    try:
-        close_button = WebDriverWait(driver, 5).until(
-            EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'Fechar') or contains(@aria-label, 'Close')]"))
-        )
-        close_button.click()
-        print("Modal fechado com sucesso.")
-    except Exception as e:
-        print("Nenhum modal encontrado.", e)
-
-    # Tenta clicar no botão usando JavaScript
-    driver.execute_script("arguments[0].click();", aplicar)
 
     # Aguarda a tabela carregar
-    table = WebDriverWait(driver, 15).until(
+    table = WebDriverWait(driver, 5).until(
         EC.presence_of_element_located((By.XPATH, "/html/body/div[1]/div[2]/div[2]/div[2]/div[1]/div[3]/div[3]/table"))
     )
 
