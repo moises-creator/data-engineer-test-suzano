@@ -23,8 +23,4 @@ services:
 
 networks:
   default:
-
     driver: bridge
-    external:
-      name: data-engineer-test-main_759b65_default
-
