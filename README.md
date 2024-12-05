@@ -62,8 +62,6 @@ Criar um pipeline para coletar esses dados automaticamente e armazená-los em um
 ### Bibliotecas Python:
 - **Selenium** 🖱️: Para automação de scraping web.
 - **Requests** 🌐: Para consumo de APIs REST.
-- **psycopg2** 🛢️: Para conexão ao banco de dados PostgreSQL.
-- **python-dotenv** 🔑: Para gerenciamento de variáveis sensíveis.
 - **rich** ✨: Para mensagens de console mais amigáveis.
 
 ---
@@ -87,13 +85,6 @@ Criar um pipeline para coletar esses dados automaticamente e armazená-los em um
    DB_CONNECTION_ID=pg_default
    ```
 
-3. Instale as dependências locais (opcional para desenvolvimento):
-   ```bash
-   pip install -r requirements.txt
-   ```
-
----
-
 ### 3. Inicialize o Ambiente Astro CLI:
 1. Suba os serviços com Docker:
    ```bash
@@ -116,7 +107,7 @@ Criar um pipeline para coletar esses dados automaticamente e armazená-los em um
    - Os dados são salvos em arquivos JSON no diretório `/tmp`.
 
 2. **Criação de Tabelas**:
-   - Um operador (`CloudSQLExecuteQueryOperator`) cria as tabelas no Google Cloud SQL.
+   - Um operador (`PostgresOperator`) cria as tabelas no Google Cloud SQL.
 
 3. **Carregamento dos Dados**:
    - Tarefas paralelas inserem os dados nas tabelas respectivas.
