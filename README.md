@@ -78,7 +78,7 @@ Criar um pipeline para coletar esses dados automaticamente e armazená-los em um
 ### 2. Configuração do Ambiente:
 1. Clone este repositório:
    ```bash
-   git clone git@github.com:seu-usuario/data-engineer-test.git
+   git clone git@github.com:moises-creator/data-engineer-test.git
    cd data-engineer-test
    ```
 
