@@ -6,10 +6,14 @@ from airflow.utils.dates import days_ago
 from include.scraping_utils import scrape_bloomberg, scrape_usd_cny, scrape_china_index
 import os
 
-CHROMEDRIVER_PATH = os.getenv("CHROMEDRIVER_PATH")
-GCP_CONNECTION_ID = "gcp_cloud_sql"
-INSTANCE_CONNECTION_NAME = ""  
 
+CHROMEDRIVER_PATH = os.getenv("CHROMEDRIVER_PATH")
+GCP_CONNECTION_ID = os.getenv("GCP_CONNECTION_ID")
+INSTANCE_CONNECTION_NAME = os.getenv("INSTANCE_CONNECTION_NAME")
+
+def read_sql_file(file_path):
+    with open(file_path, 'r') as file:
+        return file.read()
 
 @dag(start_date=days_ago(1), schedule=None, catchup=False, tags=["scraping", "cloud_sql"])
 def scraping_to_cloud_sql():
@@ -45,33 +49,7 @@ def scraping_to_cloud_sql():
         gcp_conn_id=GCP_CONNECTION_ID,
         instance=INSTANCE_CONNECTION_NAME,
         database="investing_extract",
-        sql="""
-        CREATE TABLE IF NOT EXISTS Bloomberg_Commodity_Index (
-            date DATE NOT NULL,
-            close DECIMAL(10, 2),
-            open DECIMAL(10, 2),
-            high DECIMAL(10, 2),
-            low DECIMAL(10, 2),
-            volume BIGINT,
-            PRIMARY KEY (date)
-        );
-        CREATE TABLE IF NOT EXISTS usd_cny (
-            date DATE NOT NULL,
-            close DECIMAL(10, 2),
-            open DECIMAL(10, 2),
-            high DECIMAL(10, 2),
-            low DECIMAL(10, 2),
-            volume BIGINT,
-            PRIMARY KEY (date)
-        );
-        CREATE TABLE IF NOT EXISTS chinese_caixin_services_index (
-            date DATE NOT NULL,
-            actual_state VARCHAR(255),
-            close DECIMAL(10, 2),
-            forecast DECIMAL(10, 2),
-            PRIMARY KEY (date)
-        );
-        """,
+        sql=read_sql_file("include/sql/create_tables.sql"),
     )
 
     load_bloomberg_task = CloudSQLExecuteQueryOperator(
@@ -79,11 +57,7 @@ def scraping_to_cloud_sql():
         gcp_conn_id=GCP_CONNECTION_ID,
         instance=INSTANCE_CONNECTION_NAME,
         database="investing_extract",
-        sql=""" 
-        INSERT INTO Bloomberg_Commodity_Index (date, close, open, high, low, volume)
-        VALUES (%(date)s, %(close)s, %(open)s, %(high)s, %(low)s, %(volume)s)
-        ON CONFLICT (date) DO NOTHING;
-        """,
+        sql=read_sql_file("include/sql/load_bloomberg.sql"),
         parameters=[
             {
                 "date": row['rowDateTimestamp'][:10],
@@ -102,11 +76,7 @@ def scraping_to_cloud_sql():
         gcp_conn_id=GCP_CONNECTION_ID,
         instance=INSTANCE_CONNECTION_NAME,
         database="investing_extract",
-        sql=""" 
-        INSERT INTO usd_cny (date, close, open, high, low, volume)
-        VALUES (%(date)s, %(close)s, %(open)s, %(high)s, %(low)s, %(volume)s)
-        ON CONFLICT (date) DO NOTHING;
-        """,
+        sql=read_sql_file("include/sql/load_usd_cny.sql"),
         parameters=[
             {
                 "date": row['rowDateTimestamp'][:10],
@@ -125,11 +95,7 @@ def scraping_to_cloud_sql():
         gcp_conn_id=GCP_CONNECTION_ID,
         instance=INSTANCE_CONNECTION_NAME,
         database="investing_extract",
-        sql=""" 
-        INSERT INTO chinese_caixin_services_index (date, actual_state, close, forecast)
-        VALUES (%(date)s, %(actual_state)s, %(close)s, %(forecast)s)
-        ON CONFLICT (date) DO NOTHING;
-        """,
+        sql=read_sql_file("include/sql/load_china_index.sql"),
         parameters=[
             {
                 "date": datetime.utcfromtimestamp(row['timestamp'] // 1000).strftime('%Y-%m-%d'),
@@ -142,9 +108,13 @@ def scraping_to_cloud_sql():
     )
 
     chain(
-        [scrape_bloomberg_task, scrape_usd_cny_task, scrape_china_index_task],
+        scrape_bloomberg_task, 
+        scrape_usd_cny_task, 
+        scrape_china_index_task,
         create_tables_task,
-        [load_bloomberg_task, load_usd_cny_task, load_china_index_task],
+        load_bloomberg_task, 
+        load_usd_cny_task, 
+        load_china_index_task,
     )
 
 
