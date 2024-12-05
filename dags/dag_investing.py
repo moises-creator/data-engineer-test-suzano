@@ -8,6 +8,7 @@ import os
 
 CHROMEDRIVER_PATH = os.getenv("CHROMEDRIVER_PATH")
 GCP_CONNECTION_ID = "gcp_cloud_sql"
+INSTANCE_CONNECTION_NAME = ""  
 
 
 @dag(start_date=days_ago(1), schedule=None, catchup=False, tags=["scraping", "cloud_sql"])
