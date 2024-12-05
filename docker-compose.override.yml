@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  webserver:
+    networks:
+      - default
+  scheduler:
+    networks:
+      - default
+  triggerer:
+    networks:
+      - default
+
+  selenium:
+    image: selenium/standalone-chrome:latest
+    container_name: selenium
+    ports:
+      - "4444:4444"
+      - "7900:7900"
+    shm_size: 2g
+    networks:
+      - default
+
+networks:
+  default:
+    driver: bridge
