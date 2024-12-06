@@ -104,10 +104,10 @@ def load_china_index_task(**kwargs):
     
     pg_hook = PostgresHook(postgres_conn_id=DB_CONNECTION_ID)
     pg_hook.insert_rows(
-        table="chinese_caixin_services_index",  # Nome da tabela
-        rows=rows,                             # Dados para inserir
-        target_fields=["date", "actual_state", "close", "forecast"],  # Campos alvo
-        commit_every=1000                      # Divide em lotes de 1000
+        table="chinese_caixin_services_index",  
+        rows=rows,                             
+        target_fields=["date", "actual_state", "close", "forecast"],  
+        commit_every=1000                      
     )
 
 
