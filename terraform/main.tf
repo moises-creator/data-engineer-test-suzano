@@ -40,13 +40,6 @@ resource "google_compute_firewall" "allow_airflow" {
   source_ranges = ["0.0.0.0/0"]
 }
 
-resource "google_project_iam_member" "bqowner_permissions" {
-  project = var.project_id
-  role    = "roles/bigquery.admin"
-  member  = "serviceAccount:${google_service_account.bqowner.email}"
-}
-
-
 resource "google_project_service" "enable_bigquery" {
   project = var.project_id
   service = "bigquery.googleapis.com"
