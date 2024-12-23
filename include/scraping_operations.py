@@ -3,6 +3,9 @@
 import json  
 from datetime import datetime, time
 from selenium import webdriver  
+from selenium import webdriver
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options 
 from airflow.hooks.postgres_hook import PostgresHook
 import requests  
@@ -24,6 +27,9 @@ class DataScraper:
             options=options
         )
         driver.get("https://www.investing.com")  
+
+        WebDriverWait(driver, 20).until(EC.url_contains("investing.com"))
+
         return driver
 
     def scrape_bloomberg(self, **kwargs) -> dict:  
@@ -51,7 +57,6 @@ class DataScraper:
         .catch((error) => JSON.stringify({{"error": error.message}}));  
         """  
         try:  
-            time.sleep(5)
             data = json.loads(self.driver.execute_script(script))  
         finally:  
             self.driver.quit()  
@@ -81,7 +86,6 @@ class DataScraper:
         .catch((error) => JSON.stringify({{"error": error.message}}));  
         """  
         try:  
-            time.sleep(5)
             data = json.loads(self.driver.execute_script(script))  
         finally:  
             self.driver.quit()  
