@@ -54,33 +54,6 @@ resource "google_project_service" "enable_bigquery" {
   disable_on_destroy = false
 }
 
-resource "google_bigquery_dataset" "dataset" {
-  dataset_id                  = "suzanoinvesting"
-  friendly_name               = "test"
-  description                 = "This is a test description"
-  location                    = "EU"
-  default_table_expiration_ms = 3600000
-
-  labels = {
-    env = "default"
-  }
-
-  access {
-    role          = "OWNER"
-    user_by_email = google_service_account.bqowner.email
-  }
-
-  access {
-    role   = "READER"
-    domain = "hashicorp.com"
-  }
-}
-
-resource "google_service_account" "bqowner" {
-  account_id = "bqowner"
-}
-
-
 resource "google_storage_bucket" "static-site" {
   name          = "suzano-teste"
   location      = "EU"
