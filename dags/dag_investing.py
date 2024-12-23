@@ -4,9 +4,6 @@ from airflow.utils.dates import days_ago
 from include.scraping_operations import DataScraper, DataLoader, read_sql_file
 import os
 
-DB_CONNECTION_ID = os.getenv("DB_CONNECTION_ID")
-
-
 @dag(start_date=days_ago(1), schedule=None, catchup=False, tags=["scraping", "postgres"])
 def scraping_to_postgres():
 
