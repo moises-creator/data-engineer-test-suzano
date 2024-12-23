@@ -29,56 +29,6 @@ def scraping_to_postgres():
             return scraper.scrape_china_index(**kwargs)
         
         scrape_bloomberg() >> scrape_usd_cny() >> scrape_china_index()
-
-    # @task_group(group_id='clean_group')
-    # def cleanupGroup():
-    #     cleanup_bloomberg_task = PostgresOperator(
-    #         task_id="cleanup_bloomberg",
-    #         postgres_conn_id=DB_CONNECTION_ID,
-    #         sql="DROP TABLE IF EXISTS Bloomberg_Commodity_Index;"
-    #     )
-
-    #     cleanup_usd_cny_task = PostgresOperator(
-    #         task_id="cleanup_usd_cny",
-    #         postgres_conn_id=DB_CONNECTION_ID,
-    #         sql="DROP TABLE IF EXISTS usd_cny;"
-    #     )
-
-    #     cleanup_china_index_task = PostgresOperator(
-    #         task_id="cleanup_china_index",
-    #         postgres_conn_id=DB_CONNECTION_ID,
-    #         sql="DROP TABLE IF EXISTS chinese_caixin_services_index;"
-    #     )
-
-    #     cleanup_bloomberg_task >> cleanup_usd_cny_task >> cleanup_china_index_task
-
-    # create_tables_task = PostgresOperator(
-    #     task_id="create_tables",
-    #     postgres_conn_id=DB_CONNECTION_ID,
-    #     sql=read_sql_file("include/sql/create_tables.sql"),
-    # )
-
-    # @task_group(group_id='load_group')
-    # def loadGroup():
-    #     @task
-    #     def load_bloomberg(**kwargs):
-    #         loader = DataLoader(DB_CONNECTION_ID)
-    #         loader.load_bloomberg(**kwargs)
-
-    #     @task
-    #     def load_usd_cny(**kwargs):
-    #         loader = DataLoader(DB_CONNECTION_ID)
-    #         loader.load_usd_cny(**kwargs)
-
-    #     @task
-    #     def load_china_index(**kwargs):
-    #         loader = DataLoader(DB_CONNECTION_ID)
-    #         loader.load_china_index(**kwargs)
-            
-
-    #     load_bloomberg() >> load_usd_cny() >> load_china_index()
-
-
-    scrapeGroup() #>> cleanupGroup() >> create_tables_task >> loadGroup()
+    scrapeGroup() 
 
 scraping_to_postgres()
