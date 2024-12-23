@@ -16,7 +16,10 @@ def read_sql_file(filepath):
         return file.read()  
 
 class DataScraper:  
-    def create_driver():
+    def __init__(self):  
+        self.driver = self.create_driver()  
+
+    def create_driver(self):
         """Cria uma instância do Selenium WebDriver para uso remoto."""
         options = Options()
         driver = webdriver.Remote(
@@ -29,8 +32,7 @@ class DataScraper:
 
         return driver
 
-    def scrape_bloomberg(**kwargs) -> dict: 
-        driver = DataScraper.create_driver()
+    def scrape_bloomberg(self, **kwargs) -> dict:  
         """Scrape Bloomberg Commodity Index data and return as JSON."""  
         data_hoje = datetime.now().strftime('%Y-%m-%d')  
         script = f"""  
@@ -54,14 +56,10 @@ class DataScraper:
         .then(data => JSON.stringify(data))  
         .catch((error) => JSON.stringify({{"error": error.message}}));  
         """  
-        try:  
-            data = json.loads(driver.execute_script(script))  
-        finally:  
-            driver.quit()  
+        data = json.loads(self.driver.execute_script(script))  
         kwargs['ti'].xcom_push(key='bloomberg_data', value=data)
 
-    def scrape_usd_cny(**kwargs) -> dict:  
-        driver = DataScraper.create_driver()
+    def scrape_usd_cny(self, **kwargs) -> dict:  
         data_hoje = datetime.now().strftime('%Y-%m-%d')  
         script = f"""  
         return fetch("https://api.investing.com/api/financialdata/historical/2111?start-date=1991-01-01&end-date={data_hoje}&time-frame=Monthly&add-missing-rows=false", {{  
@@ -84,10 +82,7 @@ class DataScraper:
         .then(data => JSON.stringify(data))  
         .catch((error) => JSON.stringify({{"error": error.message}}));  
         """  
-        try:  
-            data = json.loads(driver.execute_script(script))  
-        finally:  
-            driver.quit()  
+        data = json.loads(self.driver.execute_script(script))  
         kwargs['ti'].xcom_push(key='usd_cny_data', value=data)
 
     def scrape_china_index(self, **kwargs) -> dict:  
@@ -96,6 +91,8 @@ class DataScraper:
         response = requests.get(url)  
         if response.status_code == 200:  
             kwargs['ti'].xcom_push(key='china_index_data', value=response.json())
+        
+        self.driver.quit()
   
         
 
