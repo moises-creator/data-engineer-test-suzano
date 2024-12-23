@@ -24,7 +24,7 @@ resource "google_compute_instance" "airflow_instance" {
 
   metadata_startup_script = file("instance_startup_script.sh")
 
-  tags = ["airflow", "docker", "http-server", "https-server"] 
+  tags = ["airflow", "docker", "http-server", "https-server"]
 
 }
 
@@ -34,10 +34,10 @@ resource "google_compute_firewall" "allow_airflow" {
 
   allow {
     protocol = "tcp"
-    ports    = ["8080", "80", "443", "7900", "4444"] 
+    ports    = ["80", "443", "7900", "4444","8081"]
   }
 
-  source_ranges = ["0.0.0.0/0"] 
+  source_ranges = ["0.0.0.0/0"]
 }
 
 output "instance_ip" {
