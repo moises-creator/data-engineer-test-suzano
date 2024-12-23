@@ -16,10 +16,7 @@ def read_sql_file(filepath):
         return file.read()  
 
 class DataScraper:  
-    def __init__(self):  
-        self.driver = self.create_driver()  
-
-    def create_driver(self):
+    def create_driver():
         """Cria uma instância do Selenium WebDriver para uso remoto."""
         options = Options()
         driver = webdriver.Remote(
@@ -32,7 +29,8 @@ class DataScraper:
 
         return driver
 
-    def scrape_bloomberg(self, **kwargs) -> dict:  
+    def scrape_bloomberg(self, **kwargs) -> dict: 
+        driver = self.create_driver()
         """Scrape Bloomberg Commodity Index data and return as JSON."""  
         data_hoje = datetime.now().strftime('%Y-%m-%d')  
         script = f"""  
@@ -57,12 +55,13 @@ class DataScraper:
         .catch((error) => JSON.stringify({{"error": error.message}}));  
         """  
         try:  
-            data = json.loads(self.driver.execute_script(script))  
+            data = json.loads(driver.execute_script(script))  
         finally:  
-            self.driver.quit()  
+            driver.quit()  
         kwargs['ti'].xcom_push(key='bloomberg_data', value=data)
 
     def scrape_usd_cny(self, **kwargs) -> dict:  
+        driver = self.create_driver()
         data_hoje = datetime.now().strftime('%Y-%m-%d')  
         script = f"""  
         return fetch("https://api.investing.com/api/financialdata/historical/2111?start-date=1991-01-01&end-date={data_hoje}&time-frame=Monthly&add-missing-rows=false", {{  
@@ -86,9 +85,9 @@ class DataScraper:
         .catch((error) => JSON.stringify({{"error": error.message}}));  
         """  
         try:  
-            data = json.loads(self.driver.execute_script(script))  
+            data = json.loads(driver.execute_script(script))  
         finally:  
-            self.driver.quit()  
+            driver.quit()  
         kwargs['ti'].xcom_push(key='usd_cny_data', value=data)
 
     def scrape_china_index(self, **kwargs) -> dict:  
