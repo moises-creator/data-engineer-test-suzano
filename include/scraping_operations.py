@@ -16,14 +16,15 @@ class DataScraper:
     def __init__(self):  
         self.driver = self.create_driver()  
 
-    def create_driver(self):  
-        """Cria uma instância do Selenium WebDriver para uso remoto."""  
-        options = Options()  
-        driver = webdriver.Remote(  
-            command_executor="http://selenium:4444",  
-            options=options  
-        )  
-        return driver  
+    def create_driver(self):
+        """Cria uma instância do Selenium WebDriver para uso remoto."""
+        options = Options()
+        driver = webdriver.Remote(
+            command_executor="http://selenium:4444",
+            options=options
+        )
+        driver.get("https://www.investing.com")  # <-- Abre a URL desejada
+        return driver
 
     def scrape_bloomberg(self, **kwargs) -> dict:  
         """Scrape Bloomberg Commodity Index data and return as JSON."""  
