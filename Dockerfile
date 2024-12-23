@@ -5,3 +5,4 @@ USER root
 RUN pip install --no-cache-dir selenium requests
 
 USER astro
+

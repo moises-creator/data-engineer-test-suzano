@@ -9,7 +9,8 @@ __pycache__/
 
 # C extensions
 *.so
-
+LICENSE.txt
+terraform-provider-google_v6.14.1_x5
 # Distribution / packaging
 .Python
 build/

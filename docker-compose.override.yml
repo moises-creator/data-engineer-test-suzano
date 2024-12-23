@@ -4,9 +4,15 @@ services:
   webserver:
     networks:
       - default
+    ports:
+      - "0.0.0.0:8080:8080"  
+    environment:
+      - AIRFLOW__WEBSERVER__WEB_SERVER_HOST=0.0.0.0
+
   scheduler:
     networks:
       - default
+
   triggerer:
     networks:
       - default
