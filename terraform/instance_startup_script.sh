@@ -17,18 +17,14 @@ sudo apt-get update
 sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
 sudo usermod -aG docker $USER
 
-
 curl -sSL https://install.astronomer.io | sudo bash
-
 
 git clone https://github.com/moises-creator/data-engineer-test-suzano.git
 cd data-engineer-test-suzano
 
-
-PROJECT_ID="gentle-platform-443802-k8"
+PROJECT_ID="gentle-platform-443802-k8" 
 SERVICE_ACCOUNT="bqowner@$PROJECT_ID.iam.gserviceaccount.com"
 KEY_FILE="/home/$USER/bqowner-key.json"
-
 
 gcloud iam service-accounts keys create $KEY_FILE --iam-account $SERVICE_ACCOUNT
 
@@ -37,4 +33,10 @@ source ~/.bashrc
 
 pip install apache-airflow-providers-google
 
+
 astro dev start
+
+export AIRFLOW_HOME=$(pwd)/airflow 
+airflow connections add google_cloud_default \
+    --conn-type google_cloud_platform \
+    --conn-extra "{\"extra__google_cloud_platform__key_path\": \"$KEY_FILE\", \"extra__google_cloud_platform__project\": \"$PROJECT_ID\"}"
