@@ -6,6 +6,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
 from airflow.hooks.postgres_hook import PostgresHook
 import requests
+import pandas as pd
 
 def read_sql_file(filepath):
     """Lê um arquivo SQL e retorna o conteúdo como uma string."""
@@ -53,6 +54,8 @@ class DataScraper:
             data = json.loads(driver.execute_script(script))
         finally:
             driver.quit()
+
+        # pd.DataFrame(data['data']).to_csv('include/csv/bloomberg.csv', index=False)
         kwargs['ti'].xcom_push(key='bloomberg_data', value=data)
 
     def scrape_usd_cny(self, **kwargs):
@@ -84,6 +87,8 @@ class DataScraper:
             data = json.loads(driver.execute_script(script))
         finally:
             driver.quit()
+        
+        # pd.DataFrame(data['data']).to_csv('include/csv/usd_cny.csv', index=False)
         kwargs['ti'].xcom_push(key='usd_cny_data', value=data)
 
     def scrape_china_index(self, **kwargs):
@@ -92,6 +97,8 @@ class DataScraper:
         response = requests.get(url)
         if response.status_code == 200:
             kwargs['ti'].xcom_push(key='china_index_data', value=response.json())
+
+        # pd.DataFrame(response.json()['attr']).to_csv('include/csv/china_index.csv', index=False)
 
 class DataLoader:
     def __init__(self, db_connection_id):
