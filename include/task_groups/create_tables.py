@@ -3,8 +3,9 @@ from airflow.utils.task_group import TaskGroup
 from airflow.providers.google.cloud.operators.bigquery import BigQueryInsertJobOperator
 
 
+
 class CreateTablesTG(TaskGroup):
-        def __init__(self, group_id, tooltip="Criacao da tabela arquivos na camada bronze do BigQuery e Cloud Storage", **kwargs):
+        def __init__(self, group_id, projet_id="gentle-platform-443802-k8", dataset_id="suzanoinvesting", tooltip="Cria tabelas no BigQuery", **kwargs):
             super().__init__(group_id=group_id, tooltip=tooltip, **kwargs)
 
             create_bloomberg_table = BigQueryInsertJobOperator(
@@ -12,7 +13,7 @@ class CreateTablesTG(TaskGroup):
                 configuration={
                     "query": {
                         "query": f"""
-                        CREATE TABLE IF NOT EXISTS `{{params.project_id}}.{{params.dataset_id}}.bloomberg` (
+                        CREATE TABLE IF NOT EXISTS `{projet_id}.{dataset_id}.bloomberg` (
                             date DATE,
                             close FLOAT64,
                             open FLOAT64,
@@ -32,7 +33,7 @@ class CreateTablesTG(TaskGroup):
                 configuration={
                     "query": {
                         "query": f"""
-                        CREATE TABLE IF NOT EXISTS `{{params.project_id}}.{{params.dataset_id}}.usd_cny` (
+                        CREATE TABLE IF NOT EXISTS `{projet_id}.{dataset_id}.usd_cny` (
                             date DATE,
                             close FLOAT64,
                             open FLOAT64,
@@ -52,7 +53,7 @@ class CreateTablesTG(TaskGroup):
                 configuration={
                     "query": {
                         "query": f"""
-                        CREATE TABLE IF NOT EXISTS `{{params.project_id}}.{{params.dataset_id}}.chinese_caixin_services_index` (
+                        CREATE TABLE IF NOT EXISTS `{projet_id}.{dataset_id}.chinese_caixin_services_index` (
                             date DATE,
                             actual_state STRING,
                             close FLOAT64,

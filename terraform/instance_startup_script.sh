@@ -8,7 +8,6 @@ sudo apt-get update && sudo apt-get install -y \
     python3-pip \
     git
 
-
 sudo mkdir -m 0755 -p /etc/apt/keyrings
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
 echo \
@@ -19,6 +18,21 @@ sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plu
 sudo usermod -aG docker $USER
 
 curl -sSL https://install.astronomer.io | sudo bash
+
+
+if [ ! -f ~/.ssh/id_ed25519 ]; then
+    echo "Gerando chave SSH..."
+    ssh-keygen -t ed25519 -C "moises.ximenes5@gmail.com" -f ~/.ssh/id_ed25519 -q -N ""
+    eval "$(ssh-agent -s)"
+    ssh-add ~/.ssh/id_ed25519
+
+    echo "Adicione a seguinte chave pública ao GitHub (SSH):"
+    cat ~/.ssh/id_ed25519.pub
+    echo "Abortando script para configurar a chave no GitHub."
+    exit 1
+fi
+
+ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
 
 
 git clone https://github.com/moises-creator/data-engineer-test-suzano.git

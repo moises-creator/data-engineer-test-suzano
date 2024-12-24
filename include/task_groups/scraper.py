@@ -5,7 +5,7 @@ from airflow.decorators import task
 
 class DataScraperTG(TaskGroup):
 
-    def __init__(self, group_id, tooltip="Criacao da tabela arquivos na camada bronze do BigQuery e Cloud Storage", **kwargs):
+    def __init__(self, group_id, tooltip="Extrai as informacoes dos sites de investimento", **kwargs):
         super().__init__(group_id=group_id, tooltip=tooltip, **kwargs)
 
 

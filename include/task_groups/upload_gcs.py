@@ -4,7 +4,7 @@ from airflow.providers.google.cloud.transfers.local_to_gcs import LocalFilesyste
 
 
 class UploadToGcsTG(TaskGroup):
-    def __init__(self, group_id, tooltip="Criacao da tabela arquivos na camada bronze do BigQuery e Cloud Storage", **kwargs):
+    def __init__(self, group_id, tooltip="Carrega os arquivos csv no bucket", **kwargs):
         super().__init__(group_id=group_id, tooltip=tooltip, **kwargs)
 
 

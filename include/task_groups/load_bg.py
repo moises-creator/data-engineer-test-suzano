@@ -1,11 +1,12 @@
-from asyncio import TaskGroup
+from include.scraping_operations import DataScraper
+from airflow.utils.task_group import TaskGroup
 from airflow.providers.google.cloud.transfers.gcs_to_bigquery import GCSToBigQueryOperator
 
 class LoadToBigQueryTG(TaskGroup):
-    def __init__(self, group_id, tooltip="Carregamento dos dados no BigQuery", **kwargs):
+    def __init__(self, group_id, tooltip="Carregas os dados no BG", **kwargs):
         super().__init__(group_id=group_id, tooltip=tooltip, **kwargs)
 
-        
+
         load_bloomberg = GCSToBigQueryOperator(
             task_id="load_bloomberg",
             bucket="{{ params.bucket_name }}",
