@@ -114,8 +114,12 @@ Obs: Para destruir o projeto, execute o comando `terraform destroy`. Aguarde alg
 
 
 4. Execute a DAG `dag_investing` na interface.
+```Obs: O site `investing.com` é um pouco pesado para a máquina virtual selecionada, caso apresente falhas na primeira e segunda tentativa, execute novamente por gentileza.```
 
 ---
+
+5. Por fim, execute o seguinte comando no terminal local para excluir a instância:
+```terraform destroy```
 
 ## 🗂️ **Fluxo do Pipeline**
 
