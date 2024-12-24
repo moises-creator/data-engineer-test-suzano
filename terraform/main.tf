@@ -49,7 +49,7 @@ resource "google_project_service" "enable_bigquery" {
 
 resource "google_storage_bucket" "static-site" {
   name          = "suzano-scraping-data"
-  location      = "EU"
+  location      = "US"
   force_destroy = true
 
   uniform_bucket_level_access = true

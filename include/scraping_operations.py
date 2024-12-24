@@ -56,7 +56,6 @@ class DataScraper:
             driver.quit()
 
         pd.DataFrame(data['data']).to_csv('include/csv/bloomberg.csv', index=False)
-        kwargs['ti'].xcom_push(key='bloomberg_data', value=data)
 
     def scrape_usd_cny(self, **kwargs):
         """Scrape USD/CNY data."""
@@ -89,16 +88,13 @@ class DataScraper:
             driver.quit()
         
         pd.DataFrame(data['data']).to_csv('include/csv/usd_cny.csv', index=False)
-        kwargs['ti'].xcom_push(key='usd_cny_data', value=data)
 
     def scrape_china_index(self, **kwargs):
         """Scrape Chinese Caixin Services Index data and return as JSON."""
         url = "https://sbcharts.investing.com/events_charts/eu/596.json"
         response = requests.get(url)
         if response.status_code == 200:
-            kwargs['ti'].xcom_push(key='china_index_data', value=response.json())
-
-        pd.DataFrame(response.json()['attr']).to_csv('include/csv/china_index.csv', index=False)
+            pd.DataFrame(response.json()['attr']).to_csv('include/csv/china_index.csv', index=False)
 
 class DataLoader:
     def __init__(self, db_connection_id):
