@@ -88,6 +88,11 @@ resource "google_bigquery_dataset" "dataset" {
   }
 }
 
+
+resource "google_service_account" "bqowner" {
+  account_id = "bqowner"
+}
+
 output "instance_ip" {
   value = google_compute_instance.airflow_instance.network_interface[0].access_config[0].nat_ip
 }
