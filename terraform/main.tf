@@ -34,7 +34,7 @@ resource "google_compute_firewall" "allow_airflow" {
 
   allow {
     protocol = "tcp"
-    ports    = ["80", "443", "7900", "4444","8081"]
+    ports    = ["80", "443", "7900", "4444", "8081"]
   }
 
   source_ranges = ["0.0.0.0/0"]
@@ -48,7 +48,7 @@ resource "google_project_service" "enable_bigquery" {
 }
 
 resource "google_storage_bucket" "static-site" {
-  name          = "suzano-teste"
+  name          = "suzano-scraping-data"
   location      = "EU"
   force_destroy = true
 

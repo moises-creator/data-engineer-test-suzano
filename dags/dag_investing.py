@@ -39,7 +39,7 @@ def scraping_to_gcp_bigquery():
             scraper = DataScraper()
             scraper.scrape_china_index()
 
-        scrape_bloomberg() >> scrape_usd_cny() >> scrape_china_index()
+        scrape_usd_cny() >> scrape_bloomberg() >> scrape_china_index()
 
     @task_group(group_id="upload_to_gcs")
     def upload_to_gcs():
