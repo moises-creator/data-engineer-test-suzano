@@ -66,6 +66,27 @@ resource "google_storage_bucket" "static-site" {
   }
 }
 
+resource "google_bigquery_dataset" "dataset" {
+  dataset_id                  = "suzanoinvesting"
+  friendly_name               = "test"
+  description                 = "This is a test description"
+  location                    = "EU"
+  default_table_expiration_ms = 3600000
+
+  labels = {
+    env = "default"
+  }
+
+  access {
+    role          = "OWNER"
+    user_by_email = google_service_account.bqowner.email
+  }
+
+  access {
+    role   = "READER"
+    domain = "hashicorp.com"
+  }
+}
 
 output "instance_ip" {
   value = google_compute_instance.airflow_instance.network_interface[0].access_config[0].nat_ip
