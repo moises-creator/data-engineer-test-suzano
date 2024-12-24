@@ -1,8 +1,6 @@
 provider "google" {
   project = var.project_id
   region  = var.region
-
-
 }
 
 resource "google_compute_instance" "airflow_instance" {
@@ -25,7 +23,6 @@ resource "google_compute_instance" "airflow_instance" {
   metadata_startup_script = file("instance_startup_script.sh")
 
   tags = ["airflow", "docker", "http-server", "https-server"]
-
 }
 
 resource "google_compute_firewall" "allow_airflow" {
@@ -43,7 +40,6 @@ resource "google_compute_firewall" "allow_airflow" {
 resource "google_project_service" "enable_bigquery" {
   project = var.project_id
   service = "bigquery.googleapis.com"
-
   disable_on_destroy = false
 }
 
@@ -58,6 +54,7 @@ resource "google_storage_bucket" "static-site" {
     main_page_suffix = "index.html"
     not_found_page   = "404.html"
   }
+
   cors {
     origin          = ["http://image-store.com"]
     method          = ["GET", "HEAD", "PUT", "POST", "DELETE"]
@@ -68,9 +65,9 @@ resource "google_storage_bucket" "static-site" {
 
 resource "google_bigquery_dataset" "dataset" {
   dataset_id                  = "suzanoinvesting"
-  friendly_name               = "test"
-  description                 = "This is a test description"
-  location                    = "EU"
+  friendly_name               = "suzano"
+  description                 = "Dataset para o desafio da suzano"
+  location                    = "US"
   default_table_expiration_ms = 3600000
 
   labels = {
@@ -79,18 +76,13 @@ resource "google_bigquery_dataset" "dataset" {
 
   access {
     role          = "OWNER"
-    user_by_email = google_service_account.bqowner.email
+    user_by_email = "bqowner@gentle-platform-443802-k8.iam.gserviceaccount.com"
   }
 
   access {
     role   = "READER"
     domain = "hashicorp.com"
   }
-}
-
-
-resource "google_service_account" "bqowner" {
-  account_id = "bqowner"
 }
 
 output "instance_ip" {
