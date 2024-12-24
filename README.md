@@ -66,7 +66,7 @@ Criar um pipeline para coletar esses dados automaticamente e armazená-los em um
 - **Astro CLI** 🚀: Para gerenciamento de Airflow no Docker.
 - **Docker** 🐳: Containerização do ambiente.
 - **Terraform** ⚙️: Provisionamento de infraestrutura como código.
-- **Google Cloud SQL** ☁️: Banco de dados relacional para armazenamento.
+- **Google BigQuery** ☁️: Banco de dados relacional para armazenamento.
 
 ### Bibliotecas Python:
 - **Selenium** 🖱️: Para automação de scraping web.
