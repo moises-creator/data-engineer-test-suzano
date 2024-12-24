@@ -34,18 +34,26 @@ Criar um pipeline para coletar esses dados automaticamente e armazená-los em um
 ```bash
 .
 ├── dags/                          # Código principal do DAG
-│   ├── scraping_to_cloud_sql.py   # Orquestração do pipeline
+│   ├── dag_investing.py           # Orquestração do pipeline
 ├── include/                       # Recursos auxiliares
-│   ├── sql/                       # Scripts SQL
-│   │   ├── create_tables.sql      # Criação das tabelas no Cloud SQL
-│   │   ├── load_bloomberg.sql     # Inserção de dados do Bloomberg
-│   │   ├── load_usd_cny.sql       # Inserção de dados do USD/CNY
-│   │   ├── load_china_index.sql   # Inserção de dados do índice chinês
-│   ├── scraping_utils.py          # Funções de scraping
+│   ├── task_groups/               # Task Groups usados no DAG
+│   │   ├── create_tables.py       # Task para criar tabelas no SQL
+│   │   ├── load_bg.py             # Task para carregar dados do Bloomberg
+│   │   ├── scraper.py             # Função de scraping centralizada
+│   │   ├── upload_gcs.py          # Task para upload ao Google Cloud Storage
+│   │   ├── scraping_operations.py # Outras operações de scraping
+├── terraform/                     # Arquivos para provisionamento via Terraform
+│   ├── main.tf                    # Configuração principal do Terraform
+│   ├── variables.tf               # Variáveis para parametrização
+│   ├── terraform.tfvars           # Configuração de outputs do Terraform
+├── plugins/                       # Plugins personalizados
+├── tests/                         # Testes unitários do projeto
 ├── Dockerfile                     # Configuração do container
+├── docker-compose.override.yml    # Configuração adicional do Docker Compose
 ├── requirements.txt               # Dependências Python
 ├── .env                           # Variáveis sensíveis (não versionado)
 └── README.md                      # Documentação do projeto
+
 ```
 
 ---
@@ -57,6 +65,7 @@ Criar um pipeline para coletar esses dados automaticamente e armazená-los em um
 - **Apache Airflow** 🌬️: Orquestração de pipelines de dados.
 - **Astro CLI** 🚀: Para gerenciamento de Airflow no Docker.
 - **Docker** 🐳: Containerização do ambiente.
+- **Terraform** ⚙️: Provisionamento de infraestrutura como código.
 - **Google Cloud SQL** ☁️: Banco de dados relacional para armazenamento.
 
 ### Bibliotecas Python:
@@ -71,6 +80,7 @@ Criar um pipeline para coletar esses dados automaticamente e armazená-los em um
 ### 1. Pré-requisitos:
 - **Docker** instalado ([Guia de Instalação](https://docs.docker.com/get-docker/)).
 - **Astro CLI** instalado ([Guia de Instalação](https://docs.astronomer.io/astro/cli/install-cli)).
+- **Terraform** instalado ([Guia de Instalação](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli)).
 
 ### 2. Configuração do Ambiente:
 1. Clone este repositório:
@@ -80,63 +90,54 @@ Criar um pipeline para coletar esses dados automaticamente e armazená-los em um
    ```
 
 2. Configure as variáveis de ambiente:
-   Crie um arquivo `.env` na raiz do projeto com o seguinte conteúdo:
-   ```env
-   DB_CONNECTION_ID=pg_default
+   Navegue até o diretório `terraform`:
+   ```
+   cd terraform
    ```
 
-### 3. Inicialize o Ambiente Astro CLI:
-1. Suba os serviços com Docker:
+### 3. Inicialize o Terraform:
+1. Digite o comando:
    ```bash
-   astro dev start
+   terraform init
+   terraform apply
    ```
+Obs: Para destruir o projeto, execute o comando `terraform destroy`. Aguarde alguns minutos para a instância estar completa para execução. 
 
 2. Acesse o Airflow UI:
-   - URL: [http://localhost:8080](http://localhost:8080)
+   - URL: acesse o ip externo da instância criada pelo terraform, tire o `s` do https e acrescente a porta na frente da url, exemplo: `http://34.123.54.2:8081`
    - Usuário: `admin`
    - Senha: `admin`
+3. Acrescente a conexão com o gcp utilizando a interface `Connections`:
+3.1 Project ID: `google_cloud_default`
+3.2 Escolha `GoogleBigQuery`
+3.3 Copie e cole a chave json criada no service account do IAM responsável pelo projeto.
 
-3. Execute o DAG `scraping_to_cloud_sql` na interface.
+
+4. Execute a DAG `dag_investing` na interface.
 
 ---
 
 ## 🗂️ **Fluxo do Pipeline**
 
+1. **Cria bucket**:
+
 1. **Scraping dos Dados**:
-   - Três tarefas paralelas coletam os dados usando **Selenium** e **Requests**.
-   - Os dados são salvos em arquivos JSON no diretório `/tmp`.
 
-2. **Criação de Tabelas**:
-   - Um operador (`PostgresOperator`) cria as tabelas no Google Cloud SQL.
+2. **Carrega os dados no gcs(bucket)**:
 
-3. **Carregamento dos Dados**:
-   - Tarefas paralelas inserem os dados nas tabelas respectivas.
+3. **Cria dataset no BigQuery**:
 
-4. **Orquestração**:
-   - As tarefas são orquestradas usando o **chain** do Airflow:
-     ```python
-     chain(
-         scrape_bloomberg_task, 
-         scrape_usd_cny_task, 
-         scrape_china_index_task,
-         create_tables_task,
-         load_bloomberg_task, 
-         load_usd_cny_task, 
-         load_china_index_task,
-     )
-     ```
+4. **Carrega os dados do bucket para o BigQuery**:
 
 ---
 
 ## 📈 **Consultando os Dados**
 
-Após a execução do pipeline, os dados podem ser consultados no banco **Google Cloud SQL** via qualquer ferramenta de consulta SQL, como o DBeaver ou o cliente psql.
+Após a execução do pipeline, os dados podem ser consultados no banco **Google Big Query** via qualquer ferramenta de consulta SQL.
 
 ---
 
 ## 📋 **Melhorias Futuras**
-- ✅ Implementar monitoramento com **Airflow SLA** para garantir alertas em falhas.
-- ✅ Migrar o banco de dados para um ambiente **BigQuery** para análise de dados escalável.
 - ✅ Automatizar a integração com um dashboard.
 - ✅ Implementar Data Quality usando **Soda**.
 - ✅ Aplicar **dbt** para modelagem dos dados.
