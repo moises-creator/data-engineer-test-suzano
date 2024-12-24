@@ -110,7 +110,7 @@ Obs: Para destruir o projeto, execute o comando `terraform destroy`. Aguarde alg
 3. Acrescente a conexão com o gcp utilizando a interface `Connections`:
 3.1 Project ID: `google_cloud_default`
 3.2 Escolha `GoogleBigQuery`
-3.3 Copie e cole a chave json criada no service account do IAM responsável pelo projeto.
+3.3 Copie e cole a chave json criada no service account do IAM responsável pelo projeto no campo `KeyFile JSON`.
 
 
 4. Execute a DAG `dag_investing` na interface.
