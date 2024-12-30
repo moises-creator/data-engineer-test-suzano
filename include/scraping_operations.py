@@ -137,14 +137,14 @@ class DataScraper:
 
                 colunas_relevantes = {
                     'timestamp': 'date',
-                    'actual_state': 'actual_state',
-                    'actual': 'close',
-                    'forecast': 'forecast'
+                    'actual': 'actual_state',
+                    'actual_formatted': 'close',
+                    'forecast_formatted': 'forecast'
                 }
 
                 df_filtrado = df[list(colunas_relevantes.keys())].rename(columns=colunas_relevantes)
 
-                df_filtrado['date'] = pd.to_datetime(df_filtrado['date'], unit='s').dt.strftime('%Y-%m-%d')
+                df_filtrado['date'] = pd.to_datetime(df_filtrado['date'], unit='ms')
 
                 df_filtrado.to_csv('include/csv/china_index.csv', index=False)
                 print("Dados filtrados e salvos com sucesso.")
