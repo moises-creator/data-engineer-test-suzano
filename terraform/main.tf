@@ -69,7 +69,7 @@ resource "google_bigquery_dataset" "dataset" {
   description                 = "Dataset para o desafio da suzano"
   location                    = "US"
   default_table_expiration_ms = 3600000
-  force_destroy               = true
+  delete_contents_on_destroy  = true
 
   labels = {
     env = "default"
