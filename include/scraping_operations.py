@@ -55,7 +55,25 @@ class DataScraper:
         finally:
             driver.quit()
 
-        pd.DataFrame(data['data']).to_csv('include/csv/bloomberg.csv', index=False)
+        if "data" in data:
+            df = pd.DataFrame(data['data'])
+            
+            colunas_relevantes = {
+                'rowDate': 'date',
+                'last_close': 'close',
+                'last_open': 'open',
+                'last_max': 'high',
+                'last_min': 'low',
+                'volume': 'volume'
+            }
+
+            df_filtrado = df[list(colunas_relevantes.keys())].rename(columns=colunas_relevantes)
+
+            df_filtrado.to_csv('include/csv/bloomberg.csv', index=False)
+            print("Dados filtrados e salvos com sucesso.")
+        else:
+            print("Erro: Dados não encontrados.")
+
 
     def scrape_usd_cny(self, **kwargs):
         """Scrape USD/CNY data."""
@@ -87,79 +105,50 @@ class DataScraper:
         finally:
             driver.quit()
         
-        pd.DataFrame(data['data']).to_csv('include/csv/usd_cny.csv', index=False)
+        if "data" in data:
+            df = pd.DataFrame(data['data'])
+
+            colunas_relevantes = {
+                'rowDate': 'date',
+                'last_close': 'close',
+                'last_open': 'open',
+                'last_max': 'high',
+                'last_min': 'low',
+                'volume': 'volume'
+            }
+
+            df_filtrado = df[list(colunas_relevantes.keys())].rename(columns=colunas_relevantes)
+
+            df_filtrado.to_csv('include/csv/usd_cny.csv', index=False)
+            print("Dados filtrados e salvos com sucesso.")
+        else:
+            print("Erro: Dados não encontrados.")
+
 
     def scrape_china_index(self, **kwargs):
         """Scrape Chinese Caixin Services Index data and return as JSON."""
         url = "https://sbcharts.investing.com/events_charts/eu/596.json"
         response = requests.get(url)
         if response.status_code == 200:
-            pd.DataFrame(response.json()['attr']).to_csv('include/csv/china_index.csv', index=False)
+            data = response.json()
 
-class DataLoader:
-    def __init__(self, db_connection_id):
-        self.pg_hook = PostgresHook(postgres_conn_id=db_connection_id)
+            if "attr" in data:
+                df = pd.DataFrame(data['attr'])
 
-    def load_bloomberg(self, **kwargs):
-        """Processa e carrega os dados do Bloomberg no banco de dados."""
-        data = kwargs['ti'].xcom_pull(task_ids="scrape_group.scrape_bloomberg", key='bloomberg_data')
+                colunas_relevantes = {
+                    'timestamp': 'date',
+                    'actual_state': 'actual_state',
+                    'actual': 'close',
+                    'forecast': 'forecast'
+                }
 
-        rows = [
-            (
-                row['rowDateTimestamp'][:10],   
-                row['last_closeRaw'],          
-                row['last_openRaw'],           
-                row['last_maxRaw'],            
-                row['last_minRaw'],            
-                row.get('volumeRaw', 0)        
-            )
-            for row in data['data']
-        ]
-        self.pg_hook.insert_rows(
-            table="Bloomberg_Commodity_Index",
-            rows=rows,
-            target_fields=["date", "close", "open", "high", "low", "volume"],
-            commit_every=1000
-        )
+                df_filtrado = df[list(colunas_relevantes.keys())].rename(columns=colunas_relevantes)
 
-    def load_usd_cny(self, **kwargs):
-        """Processa e carrega os dados de USD/CNY no banco de dados."""
-        data = kwargs['ti'].xcom_pull(task_ids="scrape_group.scrape_usd_cny", key='usd_cny_data')
+                df_filtrado['date'] = pd.to_datetime(df_filtrado['date'], unit='s').dt.strftime('%Y-%m-%d')
 
-        rows = [
-            (
-                row['rowDateTimestamp'][:10],   
-                row['last_closeRaw'],          
-                row['last_openRaw'],           
-                row['last_maxRaw'],            
-                row['last_minRaw'],            
-                row.get('volumeRaw', 0)        
-            )
-            for row in data['data']
-        ]
-        self.pg_hook.insert_rows(
-            table="usd_cny",
-            rows=rows,
-            target_fields=["date", "close", "open", "high", "low", "volume"],
-            commit_every=1000
-        )
-
-    def load_china_index(self, **kwargs):
-        """Processa e carrega os dados do índice da China no banco de dados."""
-        data = kwargs['ti'].xcom_pull(task_ids="scrape_group.scrape_china_index", key='china_index_data')
-
-        rows = [
-            (
-                datetime.utcfromtimestamp(row['timestamp'] // 1000).strftime('%Y-%m-%d'),   
-                row['actual_state'],       
-                row['actual'],             
-                row.get('forecast')        
-            )
-            for row in data['attr']
-        ]
-        self.pg_hook.insert_rows(
-            table="chinese_caixin_services_index",
-            rows=rows,
-            target_fields=["date", "actual_state", "close", "forecast"],
-            commit_every=1000
-        )
+                df_filtrado.to_csv('include/csv/china_index.csv', index=False)
+                print("Dados filtrados e salvos com sucesso.")
+            else:
+                print("Erro: Dados não encontrados no JSON.")
+        else:
+            print(f"Erro ao acessar a URL. Código de status: {response.status_code}")

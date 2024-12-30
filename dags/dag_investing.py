@@ -27,13 +27,6 @@ def scraping_to_gcp_bigquery():
         location="US",
     )
 
-    # create_dataset = BigQueryCreateEmptyDatasetOperator(
-    #     task_id="create_dataset",
-    #     dataset_id="{{ params.dataset_id }}",
-    #     project_id="{{ params.project_id }}",
-    #     location="US",
-    # )
-
     scraper_group = DataScraperTG(group_id="scraper_group")
 
     upload_to_gcs = UploadToGcsTG(group_id="upload_to_gcs")
