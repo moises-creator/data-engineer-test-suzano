@@ -43,6 +43,6 @@ def scraping_to_gcp_bigquery():
     load_to_bigquery = LoadToBigQueryTG(group_id="load_to_bigquery")
 
 
-    scraper_group >> upload_to_gcs >> create_tables >> load_to_bigquery
+    create_bucket >> scraper_group >> upload_to_gcs >> create_tables >> load_to_bigquery
 
 scraping_to_gcp_bigquery()
