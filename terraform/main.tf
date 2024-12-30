@@ -38,8 +38,8 @@ resource "google_compute_firewall" "allow_airflow" {
 }
 
 resource "google_project_service" "enable_bigquery" {
-  project = var.project_id
-  service = "bigquery.googleapis.com"
+  project            = var.project_id
+  service            = "bigquery.googleapis.com"
   disable_on_destroy = false
 }
 
